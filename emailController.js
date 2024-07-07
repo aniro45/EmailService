@@ -1,30 +1,33 @@
 import { getEmailInstance } from "./configEmailService.js";
+import { SendEmailCommand } from "@aws-sdk/client-ses";
+import { getEmailPayloadForSendCommand } from "./utils.js";
 
 export async function sendEmail(req, res, next) {
     const { to, from, subject, text, html } = req.body;
-    const msg = {
+
+    const payload = getEmailPayloadForSendCommand({
         to,
         from,
         subject,
         text,
         html,
-    };
+    });
 
-    getEmailInstance()
-        .send(msg)
-        .then(() => {
-            res.status(201).json({
-                status: "SUCCESS",
-                message: "Email has been sent!",
-            });
-        })
-        .catch((error) => {
-            res.status(201).json({
-                status: "FAILED",
-                message: "Problem while sending the mail.",
-                error: error,
-            });
+    try {
+        const sendEmailCommand = new SendEmailCommand(payload);
+        const data = await getEmailInstance().send(sendEmailCommand);
+        res.status(201).json({
+            status: "SUCCESS",
+            message: "Email has been sent!",
+            data: data,
         });
+    } catch (error) {
+        res.status(201).json({
+            status: "FAILED",
+            message: "Problem while sending the mail.",
+            error: error,
+        });
+    }
 }
 
 export function verifyAPIKey(req, res, next) {
