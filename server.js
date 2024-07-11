@@ -1,11 +1,12 @@
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 dotenv.config();
-import app from './app.js'
-import { initializeEmailService } from './configEmailService.js';
+import app from "./app.js";
+import Initializer from "./initializer.js";
 
-initializeEmailService();
+const initializer = new Initializer();
+await initializer.init();
 
-const port = process.env.PORT || 5570; 
+const port = process.env.PORT || 5570;
 app.listen(port, (req, res) => {
     console.log(`Email service is running on port ${port}`);
 });

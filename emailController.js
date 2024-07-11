@@ -30,6 +30,24 @@ export async function sendEmail(req, res, next) {
     }
 }
 
+export async function TestMail(msg) {
+    const { to, from, subject, text, html } = msg;
+
+    const payload = getEmailPayloadForSendCommand({
+        to,
+        from,
+        subject,
+        text,
+        html,
+    });
+
+    try {
+        const sendEmailCommand = new SendEmailCommand(payload);
+        await getEmailInstance().send(sendEmailCommand);
+        console.log("Email sent!");
+    } catch (error) {}
+}
+
 export function verifyAPIKey(req, res, next) {
     try {
         const key = req.query.key;
